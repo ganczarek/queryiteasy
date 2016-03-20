@@ -3,6 +3,7 @@ package com.asprotunity.queryiteasy.acceptance_tests;
 
 import com.asprotunity.queryiteasy.connection.InputParameter;
 import com.asprotunity.queryiteasy.connection.Row;
+import com.asprotunity.queryiteasy.internal.connection.RowFromResultSet;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -164,7 +165,7 @@ public class SupportedTypesTest extends EndToEndTestBase {
 
         getDataStore().execute(connection -> {
             List<Row> expectedValues = connection.select("SELECT * FROM testtable",
-                    rowStream -> rowStream.collect(toList()));
+                    rowStream -> rowStream.map(RowFromResultSet::new).collect(toList()));
             assertThat(expectedValues.size(), is(1));
             assertThat(expectedValues.get(0).fromBlob("first", optInputStream ->
                     readFrom(optInputStream, charset.name())), is(nullValue()));
@@ -188,7 +189,7 @@ public class SupportedTypesTest extends EndToEndTestBase {
         });
 
         return getDataStore().executeWithResult(connection ->
-                connection.select("SELECT * FROM testtable", rowStream -> rowStream.collect(toList()))
+                connection.select("SELECT * FROM testtable", rowStream -> rowStream.map(RowFromResultSet::new).collect(toList()))
         );
     }
 

@@ -5,12 +5,14 @@ import com.asprotunity.queryiteasy.connection.Row;
 import com.asprotunity.queryiteasy.connection.RuntimeSQLException;
 import com.asprotunity.queryiteasy.connection.StringInputOutputParameter;
 import com.asprotunity.queryiteasy.connection.StringOutputParameter;
+import com.asprotunity.queryiteasy.internal.connection.RowFromResultSet;
 import org.junit.Test;
 
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.asprotunity.queryiteasy.connection.Batch.batch;
 import static com.asprotunity.queryiteasy.connection.InputParameterDefaultBinders.bind;
@@ -114,7 +116,14 @@ public class QueriesTest extends EndToEndTestBase {
 
         List<Integer> result = getDataStore().executeWithResult(connection ->
                 connection.select("SELECT first FROM testtable ORDER BY first ASC",
-                        rowStream -> rowStream.map(row -> row.asInteger("first")).collect(toList()))
+                        rs -> rs.map(rs1 -> {
+                            try {
+                                return rs1.getInt("first");
+                            } catch (SQLException e) {
+                                // TODO: what to do? Wrap ResultSet?
+                                throw new RuntimeSQLException(e);
+                            }
+                        }).collect(Collectors.toList()))
         );
 
         assertThat(result.size(), is(2));
@@ -131,7 +140,7 @@ public class QueriesTest extends EndToEndTestBase {
 
         List<Row> result = getDataStore().executeWithResult(connection ->
                 connection.select("SELECT first, second FROM testtable WHERE first = ? AND second = ?",
-                        rowStream -> rowStream.collect(toList()),
+                        rsStream -> rsStream.map(RowFromResultSet::new).collect(toList()),
                         bind(10), bind("asecond10"))
         );
 

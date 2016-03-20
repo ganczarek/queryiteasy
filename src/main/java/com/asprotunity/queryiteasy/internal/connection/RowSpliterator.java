@@ -1,13 +1,12 @@
 package com.asprotunity.queryiteasy.internal.connection;
 
-import com.asprotunity.queryiteasy.connection.Row;
 import com.asprotunity.queryiteasy.connection.RuntimeSQLException;
 
 import java.sql.ResultSet;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 
-public class RowSpliterator implements Spliterator<Row> {
+public class RowSpliterator implements Spliterator<ResultSet> {
 
     private final ResultSet resultSet;
 
@@ -16,10 +15,10 @@ public class RowSpliterator implements Spliterator<Row> {
     }
 
     @Override
-    public boolean tryAdvance(Consumer<? super Row> action) {
+    public boolean tryAdvance(Consumer<? super ResultSet> action) {
         return RuntimeSQLException.executeAndReturnResult(() -> {
             if (resultSet.next()) {
-                action.accept(new RowFromResultSet(resultSet));
+                action.accept(resultSet);
                 return true;
             }
             return false;
@@ -27,7 +26,7 @@ public class RowSpliterator implements Spliterator<Row> {
     }
 
     @Override
-    public Spliterator<Row> trySplit() {
+    public Spliterator<ResultSet> trySplit() {
         return null;
     }
 

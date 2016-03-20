@@ -63,13 +63,13 @@ public class WrappedJDBCConnection implements Connection, AutoCloseable {
 
 
     @Override
-    public <ResultType> ResultType select(String sql, Function<Stream<Row>, ResultType> processRow, InputParameter... parameters) {
+    public <ResultType> ResultType select(String sql, Function<Stream<ResultSet>, ResultType> processRow, InputParameter... parameters) {
         return RuntimeSQLException.executeAndReturnResult(() -> {
             try (PreparedStatement statement = connection.prepareStatement(sql);
                  Closer closer = new Closer()) {
                 bindParameters(parameters, statement, closer);
                 try (ResultSet rs = statement.executeQuery();
-                     Stream<Row> rowStream = StreamSupport.stream(new RowSpliterator(rs), false)) {
+                     Stream<ResultSet> rowStream = StreamSupport.stream(new RowSpliterator(rs), false)) {
                     return processRow.apply(rowStream);
                 }
             }

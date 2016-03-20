@@ -82,7 +82,7 @@ public class WrappedJDBCConnectionTest {
         when(rs.next()).thenReturn(false);
 
         final AtomicBoolean streamClosed = new AtomicBoolean(false);
-        Function<Stream<Row>, Stream<Row>> setStreamOnCloseToVerifyResultSetNotClosedBeforeStreamAndMarkStreamClosed =
+        Function<Stream<ResultSet>, Stream<ResultSet>> setStreamOnCloseToVerifyResultSetNotClosedBeforeStreamAndMarkStreamClosed =
                 rowStream -> {
                     rowStream.onClose(() -> {
                         try {
