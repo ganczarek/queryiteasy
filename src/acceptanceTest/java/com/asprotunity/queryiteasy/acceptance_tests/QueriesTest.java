@@ -116,14 +116,8 @@ public class QueriesTest extends EndToEndTestBase {
 
         List<Integer> result = getDataStore().executeWithResult(connection ->
                 connection.select("SELECT first FROM testtable ORDER BY first ASC",
-                        rs -> rs.map(rs1 -> {
-                            try {
-                                return rs1.getInt("first");
-                            } catch (SQLException e) {
-                                // TODO: what to do? Wrap ResultSet?
-                                throw new RuntimeSQLException(e);
-                            }
-                        }).collect(Collectors.toList()))
+                        rs -> rs.map(rs1 -> RuntimeSQLException.executeAndReturnResult(() -> rs1.getInt("first")))
+                                .collect(Collectors.toList()))
         );
 
         assertThat(result.size(), is(2));

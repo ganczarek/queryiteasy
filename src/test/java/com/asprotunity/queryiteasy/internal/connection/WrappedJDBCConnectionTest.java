@@ -1,6 +1,5 @@
 package com.asprotunity.queryiteasy.internal.connection;
 
-import com.asprotunity.queryiteasy.connection.Row;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
